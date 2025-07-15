@@ -1,6 +1,9 @@
 package main
 
-import "net"
+import (
+	"fmt"
+	"net"
+)
 
 type User struct {
 	Name   string
@@ -52,10 +55,28 @@ func (user *User) Offline() {
 	server.BroadCast(user, "用户下线")
 }
 
+// 给user对应的客户端发送消息
+func (user *User) SendMessage(msg string) {
+	user.conn.Write([]byte(msg))
+
+}
+
 // 用户处理消息
 func (user *User) DoMessage(msg string) {
 	server := user.server
-	server.BroadCast(user, msg)
+
+	if msg == "who" {
+		// 查询当前在线用户
+		server.mapLock.Lock()
+		for _, onlineUser := range server.OnlineMap {
+			onlineUserMsg := fmt.Sprintf("[%s]%s:在线...\n", onlineUser.Addr, onlineUser.Name)
+			user.SendMessage(onlineUserMsg)
+		}
+		server.mapLock.Unlock()
+	} else {
+		server.BroadCast(user, msg)
+	}
+
 }
 
 // 监听当前User channel的方法，一旦有消息就直接发给对端客户端
