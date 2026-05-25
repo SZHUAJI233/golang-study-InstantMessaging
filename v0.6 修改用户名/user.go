@@ -69,23 +69,6 @@ func (user *User) DoMessage(msg string) {
 	if msg[0] == byte('/') {
 		command := strings.Split(msg, " ")
 		switch command[0] {
-		// 私聊
-		case "/tell":
-			if len(command) < 3 {
-				user.SendMessage("正确用法：/tell <name> <msg>\n")
-			} else {
-				// 分解指令参数
-				toUserName := command[1]
-				msg := strings.Join(command[2:], " ")
-				// 获取目标用户对象
-				toUser, ok := server.OnlineMap[toUserName]
-				if !ok {
-					user.SendMessage("用户不在线！\n")
-				} else {
-					toUser.SendMessage(user.Name + "对您说：" + msg + "\n")
-				}
-			}
-		// 查询在线用户
 		case "/who":
 			// 查询当前在线用户
 			server.mapLock.Lock()
@@ -94,9 +77,8 @@ func (user *User) DoMessage(msg string) {
 				user.SendMessage(onlineUserMsg)
 			}
 			server.mapLock.Unlock()
-		// 修改名称
 		case "/rename":
-			if len(command) != 2 {
+			if len(command) > 2 || len(command) == 1 {
 				user.SendMessage("正确用法：/rename <name>\n")
 			} else {
 				newName := command[1]

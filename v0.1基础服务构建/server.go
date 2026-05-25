@@ -28,6 +28,7 @@ func (server *Server) Handler(conn net.Conn) {
 // 启动服务器的接口
 func (server *Server) Start() {
 	// socket listen
+	// 监听端口，等待客户端连接
 	listener, err := net.Listen("tcp", fmt.Sprintf("%s:%d", server.Ip, server.Port))
 	if err != nil {
 		fmt.Println("net.Nisten err:", err)
@@ -39,6 +40,8 @@ func (server *Server) Start() {
 
 	for {
 		// accept
+		// accept阻塞进程，等待客户端连接
+		// 接受客户端连接后，返回conn连接对象
 		conn, err := listener.Accept()
 		if err != nil {
 			fmt.Println("listener.Accept err:", err)
@@ -46,6 +49,7 @@ func (server *Server) Start() {
 		}
 
 		// do handler
+		// 启动协程处理连接
 		go server.Handler(conn)
 	}
 

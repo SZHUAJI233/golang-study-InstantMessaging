@@ -93,7 +93,7 @@ func (server *Server) Handler(conn net.Conn) {
 		case <-isLive:
 			// 当前用户活跃，应该重置定时器
 			// 当前case执行后当前select结束，开启了新的select，则计时器也重置
-		case <-time.After(time.Minute * 10): // 计时10min
+		case <-time.After(time.Second * 10): // 计时10s
 			// 10s后超时，发送信息，激活case
 
 			// 强制关闭当前User
