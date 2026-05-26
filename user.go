@@ -59,7 +59,6 @@ func (user *User) Offline() {
 // 给user对应的客户端发送消息
 func (user *User) SendMessage(msg string) {
 	user.conn.Write([]byte(msg))
-
 }
 
 // 用户处理消息
@@ -82,7 +81,8 @@ func (user *User) DoMessage(msg string) {
 				if !ok {
 					user.SendMessage("用户不在线！\n")
 				} else {
-					toUser.SendMessage(user.Name + "对您说：" + msg + "\n")
+					user.SendMessage("您悄悄对 " + user.Name + " 说：" + msg + "\n")
+					toUser.SendMessage(user.Name + " 悄悄对您说：" + msg + "\n")
 				}
 			}
 		// 查询在线用户
@@ -90,6 +90,9 @@ func (user *User) DoMessage(msg string) {
 			// 查询当前在线用户
 			server.mapLock.Lock()
 			for _, onlineUser := range server.OnlineMap {
+				if onlineUser.Name == user.Name {
+					continue
+				}
 				onlineUserMsg := fmt.Sprintf("[%s]%s:在线...\n", onlineUser.Addr, onlineUser.Name)
 				user.SendMessage(onlineUserMsg)
 			}
